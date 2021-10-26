@@ -167,6 +167,8 @@ function createWindowDesktop() {
         webContents.setVisualZoomLevelLimits(1, 1);
         if (initBook.code === 1){
             updateText(initBook.msg);
+        }else{
+            global.chapter = initBook.data;
         }
         webContents.setLayoutZoomLevelLimits(0, 0);
     })
@@ -449,8 +451,10 @@ ipcMain.on('bg_text_color', function (event, data) {
     tray.destroy();
     createKey();
     createTray();
-    console.log(data);
-    book.refresh(data.id);
+    let refresh = book.refresh(data.id);
+    if(refresh.code===0){
+        global.chapter = refresh.data;
+    }
 
     if (desktopWindow != null) {
         desktopWindow.webContents.send('bg_text_color', 'ping');

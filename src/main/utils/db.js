@@ -81,11 +81,18 @@ export default {
     },
     getBookById(id) {
         //if (!this.db_util) { this.init(); }
-        return this.db_util.get('books').find({ id: id }).cloneDeep().value();
+        return this.db_util.read().get('books').find({ id: id }).cloneDeep().value();
     },
     get(key) {
         if (!this.db_util) { this.init(); }
-        return this.db_util.get(key).value();
+        return this.db_util.read().get(key).value();
+/*      坑： main进程和renderer进程拿到的db都是应用打开时所读取的。
+        在没有额外处理的情况下，在main进程拿到的内存里的db，
+        和renderer拿到的内存里的db不是同一个db，也就是所谓的不是一个db的两份引用，
+        而是一个db的两份拷贝。main进程对其进行的操作，renderer进程是不知道的。
+        换句话说，main进程对db进行了任何读写操作，renderer拿到的db依然是当初应用打开时所读取的db。
+        所以就会遇到main进程更新了数据，而renderer进程依然无法拿到新的数据。
+        解决方法：在所有的db操作的最开始，都重新读取一遍db的最新状态 */
     },
     set(key, value) {
         //if (!this.db_util) { this.init(); }

@@ -26,6 +26,32 @@
         </el-form-item>
 
         <el-col :span="12">
+          <el-form-item label="选择小说">
+            <el-select style="width:150px;" v-model="book_id" size="mini" placeholder="请选择" @change="selectOne">
+                  <el-option
+                    v-for="item in books"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id">
+                  </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
+          <el-form-item label="选择章节">
+            <el-select style="width:150px;" filterable v-model="caption" size="mini" placeholder="请选择">
+                  <el-option
+                    v-for="item in chapter"
+                    :key="item.position"
+                    :label="item.caption"
+                    :value="item.position">
+                  </el-option>
+            </el-select>
+          </el-form-item>
+        </el-col>
+
+        <el-col :span="12">
           <el-form-item label="当前页数">
             <el-input-number
               size="mini"
@@ -45,32 +71,6 @@
               :min="5"
               v-model="form.page_size"
             ></el-input-number>
-          </el-form-item>
-        </el-col>
-
-        <el-col :span="12">
-          <el-form-item label="选择小说">
-            <el-select style="width:138px;" v-model="book_id" size="mini" placeholder="请选择" @change="selectOne">
-                  <el-option
-                    v-for="item in books"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id">
-                  </el-option>
-            </el-select>
-          </el-form-item>
-        </el-col>
-
-        <el-col :span="12">
-          <el-form-item label="换行符号">
-            <el-input
-              style="width:111px;"
-              v-model="form.line_break"
-              maxlength="5"
-              size="mini"
-              placeholder="换行符号"
-              prefix-icon="el-icon-sugar"
-            ></el-input>
           </el-form-item>
         </el-col>
 
@@ -238,7 +238,7 @@
 import db from "../../main/utils/db";
 import book from "../../main/utils/book";
 import dialog from "../utils/dialog";
-import { ipcRenderer, shell } from "electron";
+import { ipcRenderer, shell, remote } from "electron";
 import hotkeys from "hotkeys-js";
 
 export default {
@@ -259,6 +259,8 @@ export default {
       key_type: 0,
       book_id: "",
       books: [{id:'nothing',name:'请选择TXT目录!'}],
+      chapter: [],
+      caption: "",
       directory_path: "",
       keyPrevious: "Ctrl+Alt",
       keyPreviousX: "",
@@ -278,10 +280,8 @@ export default {
     openUrl() {
       shell.openExternal("https://www.baidu.com");
     },
-    selectOne(book_id) {
-      this.book_id = book_id;
+    selectOne() {
       let book_info = db.getBookById(this.book_id);
-      console.log(book_info);
       if(book_info){
         this.form = book_info;
       }
@@ -379,6 +379,7 @@ export default {
       if(book_info){
         this.form = book_info;
       }
+      this.chapter = remote.getGlobal("chapter");
 
       var key_previous = db.get("key_previous");
       var arr = key_previous.split("+");

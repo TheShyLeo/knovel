@@ -6,7 +6,7 @@ import { md5 } from "./crypto"
 import iconv from "iconv-lite"
 import { defaults } from "lodash"
 
-let data;
+let data, chapter;
 let book_info = {
     curr_page: 1,       //当前页码
     page_size: 15,       //页面大小
@@ -29,7 +29,7 @@ export default {
             directoryPath: "",
             bookPath: "",
             book_id: "",
-            line_break:" ",
+            line_break: " ",
             errCode: false
         };
     },
@@ -107,7 +107,8 @@ export default {
 
         var line_break = this.line_break;
 
-        return data.toString().replace(/\n/g, "").replace(/\r/g, "").replace(/　　/g, "").replace(/ /g, "");
+        data = data.toString().replace(/\n/g, "").replace(/\r/g, "").replace(/\s+/g, " ");
+        return data;
     },
     initBooks() {
         let dbUtil = db.init();
@@ -122,11 +123,10 @@ export default {
             }
         }
         let res = this.init();
-        this.readFile();
         return res;
     },
     init() {
-        if (this.bookPath && this.bookPath !== "" && this.errCode && this.page_size) return {code: 0, msg: "success!"};
+        if (this.bookPath && this.bookPath !== "" && this.page_size) return { code: 0, msg: "success!" };
         this.book_id = db.get('book_id');
         if (this.book_id === "" || typeof this.book_id === "undefined") {
             return { code: 1, msg: "请选择TXT" }
@@ -136,14 +136,20 @@ export default {
         this.errCode = book.errCodeChecked;
         this.page_size = book.page_size;
         this.line_break = book.line_break;
-        return {code: 0, msg: "success!"};
+        let text = this.readFile();
+        chapter = this.novel_slice(text);
+        return { code: 0, msg: "success!", data:chapter };
     },
     refresh(book_id) {
-        console.log(book_id)
-        console.log(this.book_id)
         this.book_id = book_id;
-        this.bookPath = db.getBookById(this.book_id).path
-        this.readFile(true)
+        let book = db.getBookById(book_id);
+        this.bookPath = book.path
+        this.errCode = book.errCodeChecked;
+        this.page_size = book.page_size;
+        this.line_break = book.line_break;
+        let text = this.readFile(true);
+        chapter = this.novel_slice(text);
+        return { code: 0, msg: "success!", data:chapter };
     },
     makePage(text) {
         this.getStartEnd();
@@ -263,7 +269,7 @@ export default {
                 var caption = "第";
                 var j = i + 1; // 切换到数字
                 if (j >= text.length) break; // 容错处理
-                while (isNumber(text[j])) {
+                while (this.isNumber(text[j])) {
                     caption += text[j];
                     j++; if (j >= text.length) break; // 容错处理
                 }
@@ -282,22 +288,23 @@ export default {
                         i += 1;
                         if (i >= text.length) break; // 容错处理
                     }
-                    var content = ""; // 下面就是内容获取
-                    while (i < text.length) {
-                        if (i + 1 >= text.length) break; // 容错处理
-                        if (text[i + 1] == "第") { // 用于判断是不是标题，+1的目的是为了下面的i+=1设定的
-                            if (i + 2 >= text.length) break; // 容错处理
-                            var j = i + 2; while (isNumber(text[j])) {
-                                j += 1;
-                                if (j >= text.length) break; // 容错处理
-                                if (j + 1 >= text.length) break; // 容错处理
-                            } // 搜集里面的数字
-                            if ((text[j] == "章" || text[j] == "节" || text[j] == "回") && (text[j + 1] == " ")) { break; }
-                        } // 表明的确是标题，break掉
-                        content += text[i];
-                        i += 1;
-                    }
-                    var chapter = { caption: caption, content: content };
+                    var position = i;
+                    // var content = ""; // 下面就是内容获取
+                    // while (i < text.length) {
+                    //     if (i + 1 >= text.length) break; // 容错处理
+                    //     if (text[i + 1] == "第") { // 用于判断是不是标题，+1的目的是为了下面的i+=1设定的
+                    //         if (i + 2 >= text.length) break; // 容错处理
+                    //         var j = i + 2; while (isNumber(text[j])) {
+                    //             j += 1;
+                    //             if (j >= text.length) break; // 容错处理
+                    //             if (j + 1 >= text.length) break; // 容错处理
+                    //         } // 搜集里面的数字
+                    //         if ((text[j] == "章" || text[j] == "节" || text[j] == "回") && (text[j + 1] == " ")) { break; }
+                    //     } // 表明的确是标题，break掉
+                    //     content += text[i];
+                    //     i += 1;
+                    // }
+                    var chapter = { caption: caption, position: position };
                     result[result.length] = chapter;
                 }
                 else { }// 如果不是'章'的话，说明那就不是标题，而是一段文本，在这种情况下，这种文本不能算入章节中的，应该舍弃不要
