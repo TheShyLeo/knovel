@@ -48,7 +48,6 @@ export default {
                 obj.name = v.slice(0, v.lastIndexOf('.'));
                 obj.path = dirPath + "\\" + v;
                 obj.id = md5(obj.path);
-                console.log(obj)
                 defaults(obj, book_info);
                 res.push(obj);
             }

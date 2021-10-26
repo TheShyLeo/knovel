@@ -40,9 +40,11 @@
 
         <el-col :span="12">
           <el-form-item label="选择章节">
-            <el-select style="width:150px;" filterable v-model="caption" size="mini" placeholder="请选择">
+            <el-select style="width:150px;" v-model="caption" size="mini" placeholder="请选择"
+              clearable filterable :filter-method="filterMethod" v-el-select-loadmore="loadMore(rangeNumber)"
+              @visible-change="visibleChange">
                   <el-option
-                    v-for="item in chapter"
+                    v-for="item in chapter.slice(0, rangeNumber)"
                     :key="item.position"
                     :label="item.caption"
                     :value="item.position">
@@ -236,7 +238,7 @@
 
 <script>
 import db from "../../main/utils/db";
-import book from "../../main/utils/book";
+import {_debounce} from "../../main/utils/index";
 import dialog from "../utils/dialog";
 import { ipcRenderer, shell, remote } from "electron";
 import hotkeys from "hotkeys-js";
@@ -256,6 +258,7 @@ export default {
         txt_color: "",
         errCodeChecked: false,
       },
+      rangeNumber: 10,
       key_type: 0,
       book_id: "",
       books: [{id:'nothing',name:'请选择TXT目录!'}],
@@ -284,6 +287,26 @@ export default {
       let book_info = db.getBookById(this.book_id);
       if(book_info){
         this.form = book_info;
+      }
+    },
+    loadMore(n) {
+      // n是默认初始展示的条数会在渲染的时候就可以获取,具体可以打log查看
+      // elementui下拉超过7条才会出滚动条,如果初始不出滚动条无法触发loadMore方法
+      return () => (this.rangeNumber += 5); // 每次滚动到底部可以新增条数  可自定义
+    },
+        // 筛选方法
+    filterMethod:_debounce(function(filterVal){
+      if(filterVal){
+        let filterArr = this.chapter.filter((item)=>{
+          return item.caption.includes(filterVal)
+        })
+        this.chapter = filterArr;
+      }
+    },500),
+    // 下拉框出现时，调用过滤方法
+    visibleChange(flag){
+      if(flag){
+        this.filterMethod()
       }
     },
     onPreviousFocus() {
@@ -458,7 +481,27 @@ export default {
         showClose: true
       });
     }
+  },
+  directives:{
+  'el-select-loadmore':(el, binding) => {
+    // 获取element-ui定义好的scroll盒子
+    const SELECTWRAP_DOM = el.querySelector(".el-select-dropdown .el-select-dropdown__wrap");
+    if(SELECTWRAP_DOM){
+      SELECTWRAP_DOM.addEventListener("scroll", function () {
+        /**
+         * scrollHeight 获取元素内容高度(只读)
+         * scrollTop 获取或者设置元素的偏移值,
+         *  常用于:计算滚动条的位置, 当一个元素的容器没有产生垂直方向的滚动条, 那它的scrollTop的值默认为0.
+         * clientHeight 读取元素的可见高度(只读)
+         * 如果元素滚动到底, 下面等式返回true, 没有则返回false:
+         * ele.scrollHeight - ele.scrollTop === ele.clientHeight;
+         */
+        const condition = this.scrollHeight - this.scrollTop <= this.clientHeight;
+        if (condition) binding.value();
+      });
+    }
   }
+}
 };
 </script>
 
