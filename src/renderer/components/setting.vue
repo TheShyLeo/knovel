@@ -1,7 +1,7 @@
 <template>
   <el-container class="container">
-    <div style="width:500px;">
-      <el-form style="width:500px;" ref="form" :model="form" label-width="100px">
+    <div style="width:600px;">
+      <el-form style="width:600px;" ref="form" :model="form" label-width="100px">
         <el-form-item label="小说目录">
           <el-input
             style="width:80.5%;margin-top: 7px;"

@@ -170,7 +170,6 @@ export default {
     },
     getNextPage() {
         this.init();
-        console.log(this.book_id)
         let text = this.readFile();
         this.getSize(text);
         this.getPage("next");
