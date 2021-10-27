@@ -40,14 +40,14 @@
 
         <el-col :span="12">
           <el-form-item label="选择章节">
-            <el-select style="width:150px;" v-model="caption" size="mini" placeholder="请选择"
+            <el-select style="width:150px;" v-model="form.index" size="mini" placeholder="请选择"
               clearable filterable :filter-method="filterMethod" v-el-select-loadmore="loadMore(rangeNumber)"
-              @visible-change="visibleChange">
+              @visible-change="visibleChange" @change="selectChapter">
                   <el-option
-                    v-for="item in chapter.slice(0, rangeNumber)"
-                    :key="item.position"
+                    v-for="(item,index) in chapter.slice(0, rangeNumber)"
+                    :key="index"
                     :label="item.caption"
-                    :value="item.position">
+                    :value="index">
                   </el-option>
             </el-select>
           </el-form-item>
@@ -239,6 +239,7 @@
 <script>
 import db from "../../main/utils/db";
 import {_debounce} from "../../main/utils/index";
+import book from "../../main/utils/book";
 import dialog from "../utils/dialog";
 import { ipcRenderer, shell, remote } from "electron";
 import hotkeys from "hotkeys-js";
@@ -256,6 +257,7 @@ export default {
         line_break: " ",
         bg_color: "",
         txt_color: "",
+        index: 1,
         errCodeChecked: false,
       },
       rangeNumber: 10,
@@ -263,7 +265,6 @@ export default {
       book_id: "",
       books: [{id:'nothing',name:'请选择TXT目录!'}],
       chapter: [],
-      caption: "",
       directory_path: "",
       keyPrevious: "Ctrl+Alt",
       keyPreviousX: "",
@@ -287,6 +288,19 @@ export default {
       let book_info = db.getBookById(this.book_id);
       if(book_info){
         this.form = book_info;
+      }
+      let t1 = new Date().getTime();
+      let res = book.refresh(this.book_id);
+      if(res.code === 0){
+        this.chapter = res.data;
+      }
+      let t2 = new Date().getTime();
+      console.log(t2-t1)
+    },    
+    selectChapter() {
+      if(this.form.index>=0){
+        let position = this.chapter[this.form.index].position;
+        this.form.curr_page = Math.floor(position/this.form.page_size);
       }
     },
     loadMore(n) {
@@ -403,6 +417,7 @@ export default {
         this.form = book_info;
       }
       this.chapter = remote.getGlobal("chapter");
+      this.rangeNumber = this.form.index?this.form.index+5 : 10;
 
       var key_previous = db.get("key_previous");
       var arr = key_previous.split("+");

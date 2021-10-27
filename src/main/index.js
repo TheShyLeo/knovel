@@ -366,7 +366,7 @@ function createKey() {
         }
         dialog.showMessageBox(options, function (index) {
             if (index == 0) {
-                shell.openExternal('https://thief.im/#/use?id=%e5%bc%82%e5%b8%b8%e6%b1%87%e6%80%bb')
+                shell.openExternal('https://theshyleo.github.io/')
             }
         })
 
