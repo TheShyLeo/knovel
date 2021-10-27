@@ -1,7 +1,6 @@
 <template>
 	<section class="lv-left">
 		<div class="lv-left-head">
-			<!-- <img draggable="false" class="logo" src="../../../images/thief.png" alt="" /> -->
 			<div class="logo-text"></div>
 			<p>knovel</p>
 		</div>
