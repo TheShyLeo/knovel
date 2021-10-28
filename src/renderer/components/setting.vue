@@ -1,10 +1,15 @@
 <template>
   <el-container class="container">
-    <div style="width:600px;">
-      <el-form style="width:600px;" ref="form" :model="form" label-width="100px">
+    <div style="width: 600px">
+      <el-form
+        style="width: 600px"
+        ref="form"
+        :model="form"
+        label-width="100px"
+      >
         <el-form-item label="小说目录">
           <el-input
-            style="width:80.5%;margin-top: 7px;"
+            style="width: 80.5%; margin-top: 7px"
             v-model="directory_path"
             size="mini"
             placeholder="请选择小说目录"
@@ -17,7 +22,8 @@
                 id="lm"
                 v-model="form.errCodeChecked"
                 :checked="form.errCodeChecked"
-              >乱码</el-checkbox>
+                >乱码</el-checkbox
+              >
             </template>
           </el-input>
           <el-button type="primary" size="mini" @click="openTxt">
@@ -27,28 +33,45 @@
 
         <el-col :span="12">
           <el-form-item label="选择小说">
-            <el-select style="width:150px;" v-model="book_id" size="mini" placeholder="请选择" @change="selectOne">
-                  <el-option
-                    v-for="item in books"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id">
-                  </el-option>
+            <el-select
+              style="width: 150px"
+              v-model="book_id"
+              size="mini"
+              placeholder="请选择"
+              @change="selectOne"
+            >
+              <el-option
+                v-for="item in books"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              >
+              </el-option>
             </el-select>
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
           <el-form-item label="选择章节">
-            <el-select style="width:150px;" v-model="form.index" size="mini" placeholder="请选择"
-              clearable filterable :filter-method="filterMethod" v-el-select-loadmore="loadMore(rangeNumber)"
-              @visible-change="visibleChange" @change="selectChapter">
-                  <el-option
-                    v-for="(item,index) in chapter.slice(0, rangeNumber)"
-                    :key="index"
-                    :label="item.caption"
-                    :value="index">
-                  </el-option>
+            <el-select
+              style="width: 150px"
+              v-model="form.index"
+              size="mini"
+              placeholder="请选择"
+              clearable
+              filterable
+              :filter-method="filterMethod"
+              v-el-select-loadmore="loadMore(rangeNumber)"
+              @visible-change="visibleChange"
+              @change="selectChapter"
+            >
+              <el-option
+                v-for="(item, index) in chapter.slice(0, rangeNumber)"
+                :key="index"
+                :label="item.caption"
+                :value="index"
+              >
+              </el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -102,19 +125,30 @@
 
         <el-col :span="12">
           <el-form-item label="背景色">
-            <el-color-picker v-model="form.bg_color" show-alpha></el-color-picker>
+            <el-color-picker
+              v-model="form.bg_color"
+              show-alpha
+            ></el-color-picker>
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
           <el-form-item label="文字颜色">
-            <el-color-picker v-model="form.txt_color" show-alpha></el-color-picker>
+            <el-color-picker
+              v-model="form.txt_color"
+              show-alpha
+            ></el-color-picker>
           </el-form-item>
         </el-col>
 
         <el-col :span="11">
           <el-form-item label="上一页">
-            <el-select style="width:138px;" v-model="keyPrevious" size="mini" placeholder="请选择">
+            <el-select
+              style="width: 138px"
+              v-model="keyPrevious"
+              size="mini"
+              placeholder="请选择"
+            >
               <el-option label="Alt" value="Alt"></el-option>
               <el-option label="Ctrl" value="Ctrl"></el-option>
               <el-option label="Ctrl+Alt" value="Ctrl+Alt"></el-option>
@@ -122,14 +156,17 @@
           </el-form-item>
         </el-col>
 
-        <el-col style="text-align: center;margin-top: 10px; margin-left: 10px;" :span="2">
+        <el-col
+          style="text-align: center; margin-top: 10px; margin-left: 10px"
+          :span="2"
+        >
           <span>+</span>
         </el-col>
 
         <el-col :span="10">
           <el-form-item>
             <el-input
-              style="width:179px;margin-left: -100px;"
+              style="width: 179px; margin-left: -100px"
               v-model="keyPreviousX"
               maxlength="100"
               size="mini"
@@ -143,7 +180,12 @@
 
         <el-col :span="11">
           <el-form-item label="下一页">
-            <el-select style="width:138px;" v-model="keyNext" size="mini" placeholder="请选择">
+            <el-select
+              style="width: 138px"
+              v-model="keyNext"
+              size="mini"
+              placeholder="请选择"
+            >
               <el-option label="Alt" value="Alt"></el-option>
               <el-option label="Ctrl" value="Ctrl"></el-option>
               <el-option label="Ctrl+Alt" value="Ctrl+Alt"></el-option>
@@ -151,14 +193,17 @@
           </el-form-item>
         </el-col>
 
-        <el-col style="text-align: center;margin-top: 10px; margin-left: 10px;" :span="2">
+        <el-col
+          style="text-align: center; margin-top: 10px; margin-left: 10px"
+          :span="2"
+        >
           <span>+</span>
         </el-col>
 
         <el-col :span="10">
           <el-form-item>
             <el-input
-              style="width:179px;margin-left: -100px;"
+              style="width: 179px; margin-left: -100px"
               v-model="keyNextX"
               maxlength="100"
               size="mini"
@@ -172,7 +217,12 @@
 
         <el-col :span="11">
           <el-form-item label="老板键">
-            <el-select style="width:138px;" v-model="keyBoss" size="mini" placeholder="请选择">
+            <el-select
+              style="width: 138px"
+              v-model="keyBoss"
+              size="mini"
+              placeholder="请选择"
+            >
               <el-option label="Alt" value="Alt"></el-option>
               <el-option label="Ctrl" value="Ctrl"></el-option>
               <el-option label="Ctrl+Alt" value="Ctrl+Alt"></el-option>
@@ -180,14 +230,17 @@
           </el-form-item>
         </el-col>
 
-        <el-col style="text-align: center;margin-top: 10px; margin-left: 10px;" :span="2">
+        <el-col
+          style="text-align: center; margin-top: 10px; margin-left: 10px"
+          :span="2"
+        >
           <span>+</span>
         </el-col>
 
         <el-col :span="10">
           <el-form-item>
             <el-input
-              style="width:179px;margin-left: -100px;"
+              style="width: 179px; margin-left: -100px"
               v-model="keyBossX"
               maxlength="100"
               size="mini"
@@ -201,7 +254,12 @@
 
         <el-col :span="11">
           <el-form-item label="自动翻页">
-            <el-select style="width:138px;" v-model="keyAuto" size="mini" placeholder="请选择">
+            <el-select
+              style="width: 138px"
+              v-model="keyAuto"
+              size="mini"
+              placeholder="请选择"
+            >
               <el-option label="Alt" value="Alt"></el-option>
               <el-option label="Ctrl" value="Ctrl"></el-option>
               <el-option label="Ctrl+Alt" value="Ctrl+Alt"></el-option>
@@ -209,14 +267,17 @@
           </el-form-item>
         </el-col>
 
-        <el-col style="text-align: center;margin-top: 10px; margin-left: 10px;" :span="2">
+        <el-col
+          style="text-align: center; margin-top: 10px; margin-left: 10px"
+          :span="2"
+        >
           <span>+</span>
         </el-col>
 
         <el-col :span="10">
           <el-form-item>
             <el-input
-              style="width:179px;margin-left: -100px;"
+              style="width: 179px; margin-left: -100px"
               v-model="keyAutoX"
               maxlength="100"
               size="mini"
@@ -228,8 +289,14 @@
           </el-form-item>
         </el-col>
 
-        <el-col :span="24" style="text-align: center;">
-          <el-button style="width: 91%;" type="primary" size="mini" @click="onSubmit">保存</el-button>
+        <el-col :span="24" style="text-align: center">
+          <el-button
+            style="width: 91%"
+            type="primary"
+            size="mini"
+            @click="onSubmit"
+            >保存</el-button
+          >
         </el-col>
       </el-form>
     </div>
@@ -238,7 +305,7 @@
 
 <script>
 import db from "../../main/utils/db";
-import {_debounce} from "../../main/utils/index";
+import { _debounce } from "../../main/utils/index";
 import book from "../../main/utils/book";
 import dialog from "../utils/dialog";
 import { ipcRenderer, shell, remote } from "electron";
@@ -263,8 +330,8 @@ export default {
       rangeNumber: 10,
       key_type: 0,
       book_id: "",
-      books: [{id:'nothing',name:'请选择TXT目录!'}],
-      chapter: [],
+      books: [{ id: "nothing", name: "请选择TXT目录!" }],
+      chapter: [{ position: -1, caption: "请选择TXT目录!" }],
       directory_path: "",
       keyPrevious: "Ctrl+Alt",
       keyPreviousX: "",
@@ -273,7 +340,7 @@ export default {
       keyBoss: "Ctrl+Alt",
       keyBossX: "",
       keyAuto: "Ctrl+Alt",
-      keyAutoX: ""
+      keyAutoX: "",
     };
   },
   created() {
@@ -286,21 +353,21 @@ export default {
     },
     selectOne() {
       let book_info = db.getBookById(this.book_id);
-      if(book_info){
+      if (book_info) {
         this.form = book_info;
       }
       let t1 = new Date().getTime();
       let res = book.refresh(this.book_id);
-      if(res.code === 0){
+      if (res.code === 0) {
         this.chapter = res.data;
       }
       let t2 = new Date().getTime();
-      console.log(t2-t1)
-    },    
+      console.log(t2 - t1);
+    },
     selectChapter() {
-      if(this.form.index>=0){
+      if (this.form.index >= 0) {
         let position = this.chapter[this.form.index].position;
-        this.form.curr_page = Math.floor(position/this.form.page_size);
+        this.form.curr_page = Math.floor(position / this.form.page_size);
       }
     },
     loadMore(n) {
@@ -308,19 +375,19 @@ export default {
       // elementui下拉超过7条才会出滚动条,如果初始不出滚动条无法触发loadMore方法
       return () => (this.rangeNumber += 5); // 每次滚动到底部可以新增条数  可自定义
     },
-        // 筛选方法
-    filterMethod:_debounce(function(filterVal){
-      if(filterVal){
-        let filterArr = this.chapter.filter((item)=>{
-          return item.caption.includes(filterVal)
-        })
+    // 筛选方法
+    filterMethod: _debounce(function (filterVal) {
+      if (filterVal) {
+        let filterArr = this.chapter.filter((item) => {
+          return item.caption.includes(filterVal);
+        });
         this.chapter = filterArr;
       }
-    },500),
+    }, 500),
     // 下拉框出现时，调用过滤方法
-    visibleChange(flag){
-      if(flag){
-        this.filterMethod()
+    visibleChange(flag) {
+      if (flag) {
+        this.filterMethod();
       }
     },
     onPreviousFocus() {
@@ -354,11 +421,11 @@ export default {
     onKey() {
       var that = this;
 
-      hotkeys.filter = function(event) {
+      hotkeys.filter = function (event) {
         return true;
       };
 
-      hotkeys("*", function(e) {
+      hotkeys("*", function (e) {
         if (
           e.key != "Control" &&
           e.key != "Meta" &&
@@ -381,7 +448,7 @@ export default {
             keyx = "Down";
           } else if (e.key === "ArrowRight") {
             keyx = "Right";
-          }else if (e.key.trim() === "") {
+          } else if (e.key.trim() === "") {
             keyx = "不能为空格,请删掉重新输入";
           }
 
@@ -408,16 +475,20 @@ export default {
     onLoad() {
       this.book_id = db.get("book_id");
       let books = db.get("books");
-      if(books.length>0){
+      if (books.length > 0) {
         this.books = books;
       }
       this.directory_path = db.get("current_directory");
       let book_info = db.getBookById(this.book_id);
-      if(book_info){
+      if (book_info) {
         this.form = book_info;
       }
-      this.chapter = remote.getGlobal("chapter");
-      this.rangeNumber = this.form.index?this.form.index+5 : 10;
+      console.log(this.chapter);
+      let chapter = remote.getGlobal("chapter");
+      if (chapter) {
+        this.chapter = chapter;
+      }
+      this.rangeNumber = this.form.index ? this.form.index + 5 : 10;
 
       var key_previous = db.get("key_previous");
       var arr = key_previous.split("+");
@@ -458,13 +529,20 @@ export default {
         this.keyAuto = arr[0] + "+" + arr[1];
         this.keyAutoX = arr[2];
       }
-
     },
     openTxt() {
       var that = this;
-      dialog.showOpenDirectory(function(e) {
+      dialog.showOpenDirectory(function (e) {
         that.directory_path = e[0];
+        console.log(that.directory_path);
+        db.set("current_directory", that.directory_path);
+        book.initBooks();
+        let books = db.get("books");
+        if (books.length > 0) {
+          that.books = books;
+        }
       });
+      console.log("111111111");
     },
     onSubmit() {
       var key_previous = this.keyPrevious + "+" + this.keyPreviousX;
@@ -480,8 +558,8 @@ export default {
       db.set("key_auto", key_auto);
 
       let cur_book = db.getBookById(this.book_id);
-      if(this.book_id!=='nothing' && cur_book){
-        db.set("book_id", this.book_id);//当前txt
+      if (this.book_id !== "nothing" && cur_book) {
+        db.set("book_id", this.book_id); //当前txt
         this.form.id = this.book_id;
         this.form.name = cur_book.name;
         this.form.path = cur_book.path;
@@ -493,30 +571,33 @@ export default {
       this.$message({
         message: "保存成功,ヽ(￣▽￣)ﾉ",
         type: "success",
-        showClose: true
+        showClose: true,
       });
-    }
+    },
   },
-  directives:{
-  'el-select-loadmore':(el, binding) => {
-    // 获取element-ui定义好的scroll盒子
-    const SELECTWRAP_DOM = el.querySelector(".el-select-dropdown .el-select-dropdown__wrap");
-    if(SELECTWRAP_DOM){
-      SELECTWRAP_DOM.addEventListener("scroll", function () {
-        /**
-         * scrollHeight 获取元素内容高度(只读)
-         * scrollTop 获取或者设置元素的偏移值,
-         *  常用于:计算滚动条的位置, 当一个元素的容器没有产生垂直方向的滚动条, 那它的scrollTop的值默认为0.
-         * clientHeight 读取元素的可见高度(只读)
-         * 如果元素滚动到底, 下面等式返回true, 没有则返回false:
-         * ele.scrollHeight - ele.scrollTop === ele.clientHeight;
-         */
-        const condition = this.scrollHeight - this.scrollTop <= this.clientHeight;
-        if (condition) binding.value();
-      });
-    }
-  }
-}
+  directives: {
+    "el-select-loadmore": (el, binding) => {
+      // 获取element-ui定义好的scroll盒子
+      const SELECTWRAP_DOM = el.querySelector(
+        ".el-select-dropdown .el-select-dropdown__wrap"
+      );
+      if (SELECTWRAP_DOM) {
+        SELECTWRAP_DOM.addEventListener("scroll", function () {
+          /**
+           * scrollHeight 获取元素内容高度(只读)
+           * scrollTop 获取或者设置元素的偏移值,
+           *  常用于:计算滚动条的位置, 当一个元素的容器没有产生垂直方向的滚动条, 那它的scrollTop的值默认为0.
+           * clientHeight 读取元素的可见高度(只读)
+           * 如果元素滚动到底, 下面等式返回true, 没有则返回false:
+           * ele.scrollHeight - ele.scrollTop === ele.clientHeight;
+           */
+          const condition =
+            this.scrollHeight - this.scrollTop <= this.clientHeight;
+          if (condition) binding.value();
+        });
+      }
+    },
+  },
 };
 </script>
 
