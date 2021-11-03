@@ -356,13 +356,10 @@ export default {
       if (book_info) {
         this.form = book_info;
       }
-      let t1 = new Date().getTime();
       let res = book.refresh(this.book_id);
       if (res.code === 0) {
         this.chapter = res.data;
       }
-      let t2 = new Date().getTime();
-      console.log(t2 - t1);
     },
     selectChapter() {
       if (this.form.index >= 0) {
