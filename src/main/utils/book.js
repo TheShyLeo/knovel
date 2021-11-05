@@ -302,7 +302,7 @@ export default {
                     //     content += text[i];
                     //     i += 1;
                     // }
-                    var chapter = { caption: caption, position: position };
+                    var chapter = { caption: caption, position: position, index: result.length };
                     result[result.length] = chapter;
                 }
                 else { }// 如果不是'章'的话，说明那就不是标题，而是一段文本，在这种情况下，这种文本不能算入章节中的，应该舍弃不要

@@ -61,15 +61,15 @@
               clearable
               filterable
               :filter-method="filterMethod"
-              v-el-select-loadmore="loadMore(rangeNumber)"
+              v-el-select-loadmore="handleScroll"
               @visible-change="visibleChange"
               @change="selectChapter"
             >
               <el-option
-                v-for="(item, index) in chapter.slice(0, rangeNumber)"
-                :key="index"
+                v-for="item in chapter"
+                :key="item.index"
                 :label="item.caption"
-                :value="index"
+                :value="item.index"
               >
               </el-option>
             </el-select>
@@ -324,14 +324,16 @@ export default {
         line_break: " ",
         bg_color: "",
         txt_color: "",
-        index: 1,
+        index: 0,
         errCodeChecked: false,
       },
-      rangeNumber: 10,
+      rangeBefore: 0,
+      rangeAfter: 10,
       key_type: 0,
       book_id: "",
       books: [{ id: "nothing", name: "请选择TXT目录!" }],
       chapter: [{ position: -1, caption: "请选择TXT目录!" }],
+      chapterCopy: [],
       directory_path: "",
       keyPrevious: "Ctrl+Alt",
       keyPreviousX: "",
@@ -358,24 +360,34 @@ export default {
       }
       let res = book.refresh(this.book_id);
       if (res.code === 0) {
-        this.chapter = res.data;
+        this.chapterCopy = res.data;
+        this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);
       }
     },
     selectChapter() {
       if (this.form.index >= 0) {
-        let position = this.chapter[this.form.index].position;
+        let position = this.chapterCopy[this.form.index].position;
         this.form.curr_page = Math.floor(position / this.form.page_size);
       }
     },
-    loadMore(n) {
-      // n是默认初始展示的条数会在渲染的时候就可以获取,具体可以打log查看
-      // elementui下拉超过7条才会出滚动条,如果初始不出滚动条无法触发loadMore方法
-      return () => (this.rangeNumber += 5); // 每次滚动到底部可以新增条数  可自定义
+    handleScroll (type,el, middlePosition) {
+      if (type) {
+        //向下滚动
+        this.rangeAfter += 11;
+        //设置滚轮位置 优化体验
+        el.scrollTop = middlePosition - 100;
+      }else{
+        //向上滚动
+        this.rangeBefore = this.rangeBefore - 10 >= 0 ? this.rangeBefore - 10 : 0;
+        //设置滚轮位置 优化体验
+        el.scrollTop = 1;
+      }
+      this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);      
     },
     // 筛选方法
     filterMethod: _debounce(function (filterVal) {
       if (filterVal) {
-        let filterArr = this.chapter.filter((item) => {
+        let filterArr = this.chapterCopy.filter((item) => {
           return item.caption.includes(filterVal);
         });
         this.chapter = filterArr;
@@ -480,12 +492,13 @@ export default {
       if (book_info) {
         this.form = book_info;
       }
-      console.log(this.chapter);
+      this.rangeBefore = this.form.index - 10 >= 0 ? this.form.index - 10 : 0;
+      this.rangeAfter = this.form.index + 10;
       let chapter = remote.getGlobal("chapter");
       if (chapter) {
-        this.chapter = chapter;
+        this.chapterCopy = chapter;
+        this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);
       }
-      this.rangeNumber = this.form.index ? this.form.index + 5 : 10;
 
       var key_previous = db.get("key_previous");
       var arr = key_previous.split("+");
@@ -531,7 +544,6 @@ export default {
       var that = this;
       dialog.showOpenDirectory(function (e) {
         that.directory_path = e[0];
-        console.log(that.directory_path);
         db.set("current_directory", that.directory_path);
         book.initBooks();
         let books = db.get("books");
@@ -539,7 +551,6 @@ export default {
           that.books = books;
         }
       });
-      console.log("111111111");
     },
     onSubmit() {
       var key_previous = this.keyPrevious + "+" + this.keyPreviousX;
@@ -560,7 +571,6 @@ export default {
         this.form.id = this.book_id;
         this.form.name = cur_book.name;
         this.form.path = cur_book.path;
-        console.log(this.form);
         db.updateBookById(this.form);
       }
       ipcRenderer.send("bg_text_color", this.form);
@@ -580,23 +590,30 @@ export default {
       );
       if (SELECTWRAP_DOM) {
         SELECTWRAP_DOM.addEventListener("scroll", function () {
-          /**
-           * scrollHeight 获取元素内容高度(只读)
-           * scrollTop 获取或者设置元素的偏移值,
-           *  常用于:计算滚动条的位置, 当一个元素的容器没有产生垂直方向的滚动条, 那它的scrollTop的值默认为0.
-           * clientHeight 读取元素的可见高度(只读)
-           * 如果元素滚动到底, 下面等式返回true, 没有则返回false:
-           * ele.scrollHeight - ele.scrollTop === ele.clientHeight;
-           */
-          const condition =
-            this.scrollHeight - this.scrollTop <= this.clientHeight;
-          if (condition) binding.value();
+          // 当前的滚动位置 减去  上一次的滚动位置
+          // 如果为true则代表向下滚动，false代表向上滚动
+          let scrollPosition = 0
+          let flagToDirection = this.scrollTop - scrollPosition > 0
+          // 记录当前的滚动位置
+          scrollPosition = this.scrollTop
+          // 记录滚动位置距离底部的位置
+          let scrollBottom = this.scrollHeight - this.scrollTop <= this.clientHeight
+          // console.log("this.scrollHeight: "+this.scrollHeight);
+          // console.log("this.scrollTop: "+this.scrollTop);
+          // console.log("this.clientHeight: "+this.clientHeight);
+          // console.log("====================================");
+          // 如果已达到指定位置则触发
+          if (scrollBottom || scrollPosition<=0) {
+            // 将滚动行为告诉组件
+            binding.value(flagToDirection,SELECTWRAP_DOM,this.scrollHeight)
+          }
         });
       }
     },
   },
 };
 </script>
+
 
 <style scoped lang="scss">
 .container {
