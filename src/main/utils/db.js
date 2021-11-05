@@ -23,7 +23,7 @@ export default {
                 }
             }
 
-            this.file_json = new FileSync(path.join(STORE_PATH, '/knovel_data1.json'));
+            this.file_json = new FileSync(path.join(STORE_PATH, '/knovel_data.json'));
 
             this.db_util = low(this.file_json)
         }

@@ -330,6 +330,7 @@ export default {
       rangeBefore: 0,
       rangeAfter: 10,
       key_type: 0,
+      filter: false,
       book_id: "",
       books: [{ id: "nothing", name: "请选择TXT目录!" }],
       chapter: [{ position: -1, caption: "请选择TXT目录!" }],
@@ -382,7 +383,9 @@ export default {
         //设置滚轮位置 优化体验
         el.scrollTop = 1;
       }
-      this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);      
+      if(!this.filter){
+        this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);      
+      }
     },
     // 筛选方法
     filterMethod: _debounce(function (filterVal) {
@@ -391,12 +394,16 @@ export default {
           return item.caption.includes(filterVal);
         });
         this.chapter = filterArr;
+        //修改下拉标识符
+        this.filter = true;
       }
     }, 500),
-    // 下拉框出现时，调用过滤方法
+    // 下拉框出现时flag是true 消失时是false，调用过滤方法
     visibleChange(flag) {
-      if (flag) {
-        this.filterMethod();
+      console.log("visibleChange "+flag);
+      if (!flag) {
+        // this.filterMethod();
+        this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);  
       }
     },
     onPreviousFocus() {
