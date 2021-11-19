@@ -13,6 +13,7 @@ let book_info = {
     second: 5,          //自动翻页
     font_size: 20,      //字体
     line_break: " ",    //分隔符
+    index: 0,    //章节索引
     bg_color: "rgba(0, 0, 0, 0.15)",       //背景色
     txt_color: "rgba(255, 255, 255, 0.76)",      //字体色
     errCodeChecked: false,      //编码

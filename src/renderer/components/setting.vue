@@ -333,7 +333,7 @@ export default {
       filter: false,
       book_id: "",
       books: [{ id: "nothing", name: "请选择TXT目录!" }],
-      chapter: [{ position: -1, caption: "请选择TXT目录!" }],
+      chapter: [{ position: -1, caption: "请选择章节!" }],
       chapterCopy: [],
       directory_path: "",
       keyPrevious: "Ctrl+Alt",
@@ -362,6 +362,8 @@ export default {
       let res = book.refresh(this.book_id);
       if (res.code === 0) {
         this.chapterCopy = res.data;
+        this.rangeBefore = this.form.index - 10 >= 0 ? this.form.index - 10 : 0;
+        this.rangeAfter = this.form.index + 10 || 10;
         this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);
       }
     },
@@ -400,7 +402,6 @@ export default {
     }, 500),
     // 下拉框出现时flag是true 消失时是false，调用过滤方法
     visibleChange(flag) {
-      console.log("visibleChange "+flag);
       if (!flag) {
         // this.filterMethod();
         this.chapter = this.chapterCopy.slice(this.rangeBefore,this.rangeAfter);  
